@@ -1,90 +1,179 @@
 // src/components/DispatchListView.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from './ui/button'
 
-// 9개 임의의 회사 정보
+// 추천 직종
+const ROLES = ['기술지원', '자원운영', '현장보호']
+
+// 9개 회사 + stars 난이도
 const COMPANIES = [
-  { key: 'leo',   name: '레오시스템',        req:  8 },
-  { key: 'mia',   name: '미아솔루션',        req: 12 },
-  { key: 'nova',  name: '노바테크',          req: 35 },
-  { key: 'luna',  name: '루나이노베이션',    req: 10 },
-  { key: 'zeus',  name: '제우스엔터프라이즈',req: 25 },
-  { key: 'hera',  name: '헤라코퍼레이션',    req: 40 },
-  { key: 'odin',  name: '오딘네트웍스',      req: 18 },
-  { key: 'iris',  name: '아이리스미디어',    req:  5 },
-  { key: 'zephyr',name: '제피르인더스트리',  req: 50 },
+  { key: 1, name: '알파테크',     stars: 1 },
+  { key: 2, name: '브라보엔터',   stars: 1 },
+  { key: 3, name: '찰리파이',     stars: 2 },
+  { key: 4, name: '델타시스템',   stars: 1 },
+  { key: 5, name: '에코솔루션',   stars: 3 },
+  { key: 6, name: '포스코리아',   stars: 1 },
+  { key: 7, name: '골드라인',     stars: 2 },
+  { key: 8, name: '호텔유니온',   stars: 1 },
+  { key: 9, name: '인디고팩토리', stars: 3 },
 ]
 
-// 난이도별 ★ 개수 계산
-function starsFor(req) {
-  if (req <= 10)     return 1
-  if (req <= 30)     return 2
-  return 3
+// 난이도★별 파견능력 범위 & 보상 개수
+const STAR_CONFIG = {
+  1: { range: [1, 10],   stone: 1,  piece: 1 },
+  2: { range: [11, 30],  stone: 5,  piece: 5 },
+  3: { range: [31, 50],  stone: 10, piece: 10 },
 }
 
 export default function DispatchListView({
+  onBack,
   availableStamina,
   gems,
-  onBack,
-  onRefresh,       // 기업 새로고침 콜백
-  onDispatchStart, // 실제 파견 시작 콜백(company)
+  onRefresh,
+  onDispatchStart,
 }) {
+  const [selected, setSelected] = useState(null)
+  const [detail,   setDetail]   = useState(null)
+
+  const openDetail = comp => {
+    // 1~3개 직종 랜덤
+    const roles = ROLES
+      .sort(() => 0.5 - Math.random())
+      .slice(0, Math.floor(Math.random()*3) + 1)
+
+    // stars 기반 범위에서 랜덤 파견능력
+    const cfg = STAR_CONFIG[comp.stars]
+    const [min, max] = cfg.range
+    const power = Math.floor(Math.random() * (max - min + 1)) + min
+
+    setSelected(comp)
+    setDetail({
+      roles,
+      power,
+      stone: cfg.stone,
+      piece: cfg.piece,
+      staminaNeed: 10,
+    })
+  }
+
+  const dispatch = () => {
+    onDispatchStart({ ...selected, ...detail })
+    setSelected(null)
+  }
+
   return (
-    <div className="relative w-full h-full flex flex-col bg-yellow-50">
-      {/* 헤더: 뒤로가기 + 리소스 */}
-      <header className="flex items-center justify-between px-3 py-2">
-        <button
-          onClick={onBack}
-          className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center text-white"
-        >←</button>
+    <div className="relative w-full h-full bg-yellow-50 flex flex-col p-3">
+      {/* 1. 헤더 */}
+      <header className="flex items-center justify-between mb-3">
+        <Button onClick={onBack} className="px-3 py-1">
+          ← 뒤로
+        </Button>
         <div className="flex space-x-2">
           <div className="flex items-center bg-white px-2 py-1 rounded-full">
-            <img src="/images/gem_icon.png" alt="gem" className="w-4 h-4 mr-1" />
-            <span>{gems}</span>
+            <img src="/images/gem_icon.png" alt="gem" className="w-4 h-4 mr-1"/>
+            <span className="font-medium">{gems}</span>
           </div>
           <div className="flex items-center bg-white px-2 py-1 rounded-full">
-            <img src="/images/stamina_icon.png" alt="stamina" className="w-4 h-4 mr-1" />
-            <span>{availableStamina}</span>
+            <img src="/images/stamina_icon.png" alt="stamina" className="w-4 h-4 mr-1"/>
+            <span className="font-medium">{availableStamina}</span>
           </div>
         </div>
       </header>
 
-      {/* 3×3 그리드 */}
-      <div className="grid grid-cols-3 gap-4 px-3 py-2 flex-1 overflow-auto">
-        {COMPANIES.map(cmp => (
+      {/* 2. 회사 그리드 */}
+      <div className="grid grid-cols-3 gap-3 flex-1 overflow-auto mb-3">
+        {COMPANIES.map(c => (
           <div
-            key={cmp.key}
-            className="flex flex-col items-center justify-center bg-white rounded-lg shadow cursor-pointer hover:shadow-lg"
-            onClick={() => onDispatchStart(cmp)}
+            key={c.key}
+            onClick={() => openDetail(c)}
+            className="bg-white p-3 rounded shadow cursor-pointer hover:shadow-lg flex flex-col items-center"
           >
-            <div className="text-base font-bold mb-1">{cmp.name}</div>
-            {/* ★ 표시 */}
-            <div className="flex">
-              {Array.from({ length: starsFor(cmp.req) }).map((_, i) => (
-                <svg
-                  key={i}
-                  className="w-4 h-4 text-yellow-400"
-                  viewBox="0 0 20 20" fill="currentColor"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.92-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.045 9.397c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.97z"/>
-                </svg>
+            <div className="text-center font-medium">{c.name}</div>
+            <div className="mt-1">
+              {Array.from({ length: c.stars }).map((_, i) => (
+                <span key={i} className="text-yellow-500 text-xl">★</span>
               ))}
             </div>
           </div>
         ))}
       </div>
 
-      {/* 기업 새로고침 버튼 */}
-      <div className="px-3 pb-4">
+      {/* 3. 새로고침 버튼 */}
+      <div className="mb-2">
         <Button
-          className="w-full py-3 bg-green-400 text-white font-bold flex items-center justify-center"
           onClick={onRefresh}
+          className="w-full bg-pink-500 text-white py-2"
         >
-          기업 새로고침
-          <img src="/images/gem_icon.png" alt="gem" className="w-5 h-5 ml-2" />
-          <span className="ml-1">10</span>
+          새로고침 (10젬)
         </Button>
       </div>
+
+      {/* 4. 상세 팝업 */}
+      {selected && detail && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white w-full rounded-lg p-4 relative">
+            {/* 닫기 */}
+            <button
+              onClick={() => setSelected(null)}
+              className="absolute top-2 right-2 text-gray-600"
+            >
+              ✕
+            </button>
+
+            <h3 className="text-center text-lg font-bold mb-2">
+              {selected.name} 파견
+            </h3>
+            <p className="text-sm mb-2">
+              {detail.roles.join(', ')} 직종 필요
+            </p>
+            <p className="text-sm mb-1">
+              필요 파견능력:{' '}
+              <span className="font-semibold">{detail.power}</span>
+            </p>
+
+            {/* 보상 레이블 */}
+            <div className="font-medium mb-1">보상</div>
+            {/* 보상 박스 */}
+            <div className="flex justify-around mb-3">
+              <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
+                <img
+                  src="/images/reward/stone.png"
+                  alt="stone"
+                  className="w-8 h-8 mb-1"
+                />
+                <span className="text-sm">강화석</span>
+                <span className="font-semibold">{detail.stone}</span>
+              </div>
+              <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
+                <img
+                  src="/images/reward/piece.png"
+                  alt="piece"
+                  className="w-8 h-8 mb-1"
+                />
+                <span className="text-sm">조각</span>
+                <span className="font-semibold">{detail.piece}</span>
+              </div>
+            </div>
+
+            <p className="text-sm mb-4">
+              필요 스태미너:{' '}
+              <img
+                src="/images/stamina_icon.png"
+                alt="stamina"
+                className="inline w-4 h-4 align-text-bottom"
+              />
+              <span className="ml-1 font-semibold">{detail.staminaNeed}</span>
+            </p>
+
+            <Button
+              className="w-full bg-green-400 text-white font-bold py-2"
+              onClick={dispatch}
+            >
+              선택
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

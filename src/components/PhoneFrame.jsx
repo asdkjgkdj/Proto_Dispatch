@@ -1,15 +1,15 @@
 // src/components/PhoneFrame.jsx
 import React, { useState } from 'react'
-import DispatchHome       from './DispatchHome.jsx'
-import TrainingView       from './TrainingView.jsx'
-import DispatchListView   from './DispatchListView.jsx'
-import RechargeView       from './RechargeView.jsx' // (선택) 스태미너 충전용 팝업이 필요하다면 만들어서 import
+import DispatchHome     from './DispatchHome.jsx'
+import DispatchListView from './DispatchListView.jsx'
+import TrainingView     from './TrainingView.jsx'
+import RechargeView     from './RechargeView.jsx' // 스태미너 충전 팝업
 
 export default function PhoneFrame() {
-  // 전체 앱 상태: home, list, train, recharge
+  // 화면 타입: 'home' | 'list' | 'train' | 'recharge'
   const [view, setView] = useState({ type: 'home', building: null })
-  const [stamina, setStamina] = useState(10)   // 예시 초기 스태미너
-  const [gems, setGems]       = useState(100)  // 예시 초기 젬
+  const [stamina, setStamina] = useState(10)  // 초기 스태미너
+  const [gems, setGems]       = useState(100) // 초기 젬
 
   // DispatchHome → PhoneFrame
   const handleAction = (building, action) => {
@@ -27,25 +27,22 @@ export default function PhoneFrame() {
       return
     }
     setGems(g => g - 10)
-    // TODO: 실제 리스트 다시 로드 로직
+    // TODO: 실제 리스트 새로고침 로직
   }
 
   // 기업 파견 시작
   const handleDispatchStart = company => {
-    if (stamina < company.req) {
+    if (stamina < company.staminaNeed) {
       alert('스태미너가 부족합니다.')
       return
     }
-    setStamina(s => s - company.req)
-    alert(`${company.name}에 파견을 시작했습니다!`)
+    setStamina(s => s - company.staminaNeed)
+    alert(`"${company.name}" 에 파견을 시작했습니다!`)
     setView({ type: 'home', building: null })
   }
 
   // 스태미너 충전 팝업 열기
-  const openRecharge = () => {
-    setView({ type: 'recharge' })
-  }
-
+  const openRecharge = () => setView({ type: 'recharge' })
   // 스태미너 100 충전
   const handleRecharge = () => {
     setStamina(100)
@@ -58,16 +55,16 @@ export default function PhoneFrame() {
   return (
     <div className="flex items-center justify-center w-screen h-screen bg-gray-200">
       <div className="relative w-72 h-[600px] bg-black rounded-3xl overflow-hidden shadow-xl">
-        {/* 노치 */}
+
+        {/* 상단 노치 */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-3 bg-gray-900 rounded-b-xl" />
 
-        {/* 내부 */}
+        {/* 내부 화면 */}
         <div className="absolute inset-3 bg-yellow-50 rounded-2xl overflow-hidden">
           {view.type === 'home' && (
             <DispatchHome
               onAction={handleAction}
               availableStamina={stamina}
-              onConsumeStamina={amt => setStamina(s => s - amt)}
               onRechargeOpen={openRecharge}
             />
           )}
@@ -87,7 +84,6 @@ export default function PhoneFrame() {
               building={view.building}
               onBack={goBack}
               availableStamina={stamina}
-              onConsumeStamina={amt => setStamina(s => s - amt)}
               onRechargeOpen={openRecharge}
             />
           )}
