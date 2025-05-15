@@ -1,66 +1,101 @@
 // src/components/PhoneFrame.jsx
 import React, { useState } from 'react'
-import DispatchHome from './DispatchHome'
-import TrainingView from './TrainingView'
-
-function RechargeModal({ onConfirm, onClose }) {
-  return (
-    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-white rounded p-4 text-center">
-        <p className="mb-4">스태미너 100개 충전하기</p>
-        <button
-          onClick={() => { onConfirm(); onClose(); }}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          충전하기
-        </button>
-      </div>
-    </div>
-  )
-}
+import DispatchHome       from './DispatchHome.jsx'
+import TrainingView       from './TrainingView.jsx'
+import DispatchListView   from './DispatchListView.jsx'
+import RechargeView       from './RechargeView.jsx' // (선택) 스태미너 충전용 팝업이 필요하다면 만들어서 import
 
 export default function PhoneFrame() {
-  const [availableStamina, setAvailableStamina] = useState(10)
+  // 전체 앱 상태: home, list, train, recharge
   const [view, setView] = useState({ type: 'home', building: null })
-  const [showRecharge, setShowRecharge] = useState(false)
+  const [stamina, setStamina] = useState(10)   // 예시 초기 스태미너
+  const [gems, setGems]       = useState(100)  // 예시 초기 젬
 
+  // DispatchHome → PhoneFrame
   const handleAction = (building, action) => {
-    if (action === 'train') setView({ type: 'train', building })
+    if (action === 'train') {
+      setView({ type: 'train', building })
+    } else if (action === 'dispatch') {
+      setView({ type: 'list', building: null })
+    }
   }
+
+  // 기업 리스트 새로고침 (젬 10 소모)
+  const handleRefresh = () => {
+    if (gems < 10) {
+      alert('젬이 부족합니다.') 
+      return
+    }
+    setGems(g => g - 10)
+    // TODO: 실제 리스트 다시 로드 로직
+  }
+
+  // 기업 파견 시작
+  const handleDispatchStart = company => {
+    if (stamina < company.req) {
+      alert('스태미너가 부족합니다.')
+      return
+    }
+    setStamina(s => s - company.req)
+    alert(`${company.name}에 파견을 시작했습니다!`)
+    setView({ type: 'home', building: null })
+  }
+
+  // 스태미너 충전 팝업 열기
+  const openRecharge = () => {
+    setView({ type: 'recharge' })
+  }
+
+  // 스태미너 100 충전
+  const handleRecharge = () => {
+    setStamina(100)
+    setView({ type: 'home', building: null })
+  }
+
+  // 뒤로가기
   const goBack = () => setView({ type: 'home', building: null })
-
-  const consume = amt =>
-    setAvailableStamina(s => Math.max(0, s - amt))
-
-  const recharge = () =>
-    setAvailableStamina(s => s + 100)
 
   return (
     <div className="flex items-center justify-center w-screen h-screen bg-gray-200">
-      <div className="relative w-72 h-[600px] bg-black rounded-2xl overflow-hidden shadow-xl">
+      <div className="relative w-72 h-[600px] bg-black rounded-3xl overflow-hidden shadow-xl">
+        {/* 노치 */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-3 bg-gray-900 rounded-b-xl" />
+
+        {/* 내부 */}
         <div className="absolute inset-3 bg-yellow-50 rounded-2xl overflow-hidden">
-          {view.type === 'home' ? (
+          {view.type === 'home' && (
             <DispatchHome
-              availableStamina={availableStamina}
-              onConsumeStamina={consume}
               onAction={handleAction}
-              onRechargeOpen={() => setShowRecharge(true)}
-            />
-          ) : (
-            <TrainingView
-              building={view.building}
-              availableStamina={availableStamina}
-              onConsumeStamina={consume}
-              onBack={goBack}
-              onRechargeOpen={() => setShowRecharge(true)}
+              availableStamina={stamina}
+              onConsumeStamina={amt => setStamina(s => s - amt)}
+              onRechargeOpen={openRecharge}
             />
           )}
 
-          {showRecharge && (
-            <RechargeModal
-              onConfirm={recharge}
-              onClose={() => setShowRecharge(false)}
+          {view.type === 'list' && (
+            <DispatchListView
+              availableStamina={stamina}
+              gems={gems}
+              onBack={goBack}
+              onRefresh={handleRefresh}
+              onDispatchStart={handleDispatchStart}
+            />
+          )}
+
+          {view.type === 'train' && (
+            <TrainingView
+              building={view.building}
+              onBack={goBack}
+              availableStamina={stamina}
+              onConsumeStamina={amt => setStamina(s => s - amt)}
+              onRechargeOpen={openRecharge}
+            />
+          )}
+
+          {view.type === 'recharge' && (
+            <RechargeView
+              onBack={goBack}
+              onRecharge={handleRecharge}
             />
           )}
         </div>

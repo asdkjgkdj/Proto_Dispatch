@@ -111,19 +111,18 @@ export default function DispatchHome({
 
       {/* ─── 파견하기 버튼 (항상 활성화) ────────────────────────────────── */}
       <div className="absolute bottom-6 left-4 right-4">
-        <Button
-          className="w-full py-3 bg-green-400 text-white font-bold"
-          onClick={() => {
-            const req = selected
-              ? BUILDINGS.find(b => b.key === selected).stamina
-              : 0
-            onConsumeStamina(req)
-            const { label } = selected
-              ? BUILDINGS.find(b => b.key === selected)
-              : { label: '' }
-            alert(`"${label}" 파견 시작!`)
-          }}
-        >
+      + <Button
+   className="w-full py-3 bg-green-400 text-white font-bold"
+   onClick={() => {
+     // 항상 dispatch 액션 호출
+     // (만약 selected 가 null 이면 BUILDINGS[0] 사용하거나
+     // 원하는 기본값으로 설정해 주세요)
+     const building = selected
+       ? BUILDINGS.find(b => b.key === selected)
+       : BUILDINGS[0]
+     onAction(building, 'dispatch')
+   }}
+ >
           파견하러가기
         </Button>
       </div>
