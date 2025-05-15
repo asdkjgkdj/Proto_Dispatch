@@ -16,13 +16,10 @@ export default function DispatchHome({
   onRechargeOpen,
 }) {
   const [selected, setSelected] = useState(null)
-  const requiredStamina = selected
-    ? BUILDINGS.find(b => b.key === selected).stamina
-    : 0
 
   return (
     <div className="relative w-full h-full bg-yellow-50 p-4">
-      {/* 상단 스태미너 (클릭 시 충전 팝업) */}
+      {/* 상단 스태미너 */}
       <button
         onClick={onRechargeOpen}
         className="absolute top-4 right-4 flex items-center bg-white px-2 py-1 rounded shadow"
@@ -32,14 +29,11 @@ export default function DispatchHome({
           alt="stamina"
           className="w-5 h-5 mr-1"
         />
-        <span className="font-medium">
-          {availableStamina >= 0 ? availableStamina : 0}
-        </span>
+        <span className="font-medium">{availableStamina}</span>
       </button>
 
       {/* 3×3 그리드 */}
       <div className="grid grid-cols-3 grid-rows-3 gap-4 h-full">
-        {/* 파견소 */}
         <div className="col-start-2 row-start-1 flex flex-col items-center">
           <img
             src="/images/dispatch_center.png"
@@ -54,7 +48,6 @@ export default function DispatchHome({
           </div>
         </div>
 
-        {/* 빌딩 */}
         {BUILDINGS.map(b => {
           const isActive = selected === b.key
           return (
@@ -116,14 +109,18 @@ export default function DispatchHome({
         })}
       </div>
 
-      {/* 파견하기 버튼 */}
+      {/* ─── 파견하기 버튼 (항상 활성화) ────────────────────────────────── */}
       <div className="absolute bottom-6 left-4 right-4">
         <Button
           className="w-full py-3 bg-green-400 text-white font-bold"
-          disabled={!selected || availableStamina < requiredStamina}
           onClick={() => {
-            onConsumeStamina(requiredStamina)
-            const { label } = BUILDINGS.find(b => b.key === selected)
+            const req = selected
+              ? BUILDINGS.find(b => b.key === selected).stamina
+              : 0
+            onConsumeStamina(req)
+            const { label } = selected
+              ? BUILDINGS.find(b => b.key === selected)
+              : { label: '' }
             alert(`"${label}" 파견 시작!`)
           }}
         >
