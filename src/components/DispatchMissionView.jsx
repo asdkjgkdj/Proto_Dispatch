@@ -54,7 +54,7 @@ export default function DispatchMissionView({
 
     if (val > maxForThis) {
       setToastMessage('최대 인원입니다.')
-      setTimeout(() => setToastMessage(''), 3000)
+      setTimeout(() => setToastMessage(''), 1000)
       return
     }
 
@@ -76,7 +76,7 @@ export default function DispatchMissionView({
     if (clientX > allowedPx) {
       e.preventDefault()
       setToastMessage('최대 인원입니다.')
-      setTimeout(() => setToastMessage(''), 3000)
+      setTimeout(() => setToastMessage(''), 1000)
     }
   }
 

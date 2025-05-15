@@ -1,7 +1,7 @@
 // src/components/TrainingView.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from './ui/button'
-import Toast from './ui/toast.jsx'
+import Toast from './ui/Toast.jsx'
 
 export default function TrainingView({
   building,
@@ -29,7 +29,7 @@ export default function TrainingView({
   const startTraining = () => {
     if (availableStamina < staminaCost) {
       setToastMessage('스태미너가 부족합니다.')
-      setTimeout(() => setToastMessage(''), 3000)
+      setTimeout(() => setToastMessage(''), 1000)
       return
     }
     onConsumeStamina(staminaCost)

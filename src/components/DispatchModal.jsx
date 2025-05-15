@@ -29,7 +29,7 @@ export default function TrainingView({
   const startTraining = () => {
     if (availableStamina < staminaCost) {
       setToastMessage('스태미너가 부족합니다.')
-      setTimeout(() => setToastMessage(''), 3000)
+      setTimeout(() => setToastMessage(''), 1000)
       return
     }
     onConsumeStamina(staminaCost)
@@ -46,7 +46,7 @@ export default function TrainingView({
           clearInterval(timerRef.current)
           setIsTraining(false)
           setToastMessage('훈련이 완료되었습니다.')
-          setTimeout(() => setToastMessage(''), 3000)
+          setTimeout(() => setToastMessage(''), 1000)
 +         // 훈련 완료 시 onTrain 호출
 +         onTrain(level, count)
           return 0
