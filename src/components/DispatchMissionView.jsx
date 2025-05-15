@@ -27,7 +27,6 @@ export default function DispatchMissionView({
 
   // 전체 선택 인원 합계
   const totalSelected = selections.reduce((sum, s) => sum + s.count, 0)
-  // 1명당 능력치 1로 가정
   const selectedPower = totalSelected
 
   // 파견 가능 여부
@@ -44,7 +43,7 @@ export default function DispatchMissionView({
   const findWorkerCount = key =>
     candidates.find(w => w.key === key)?.count || 0
 
-  // 슬라이더 이벤트 핸들러
+  // 슬라이더 변경 핸들러
   const onSlide = (workerKey, newVal) => {
     const val = Number(newVal)
     const own = findWorkerCount(workerKey)
@@ -63,7 +62,7 @@ export default function DispatchMissionView({
     ))
   }
 
-  // 슬라이더 다운 시 터치/포인터 위치 체크
+  // 드래그 시작 시 허용 영역 검사
   const onPointerDown = (e, workerKey) => {
     const input = e.currentTarget
     const rect = input.getBoundingClientRect()
@@ -72,7 +71,7 @@ export default function DispatchMissionView({
     const remainingCapacity = maxDispatch - (totalSelected - current)
     const maxForThis = Math.min(own, remainingCapacity)
     const allowedPx = rect.left + (maxForThis / maxDispatch) * rect.width
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX)
+    const clientX = e.clientX ?? (e.touches && e.touches[0].clientX)
     if (clientX > allowedPx) {
       e.preventDefault()
       setToastMessage('최대 인원입니다.')
@@ -91,7 +90,7 @@ export default function DispatchMissionView({
         </div>
       </header>
 
-      {/* 2. 능력치 비교 + 카운터 */}
+      {/* 2. 현재/필요 능력 & 카운터 */}
       <div className="grid grid-cols-2 gap-2 text-center mb-1">
         <div>
           <div className="text-sm">현재 파견 능력</div>
@@ -118,6 +117,13 @@ export default function DispatchMissionView({
         {roles.join(', ')}
       </div>
 
+      {/* ───────── 3칸 슬롯 영역 ───────── */}
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="h-12 bg-white rounded border border-dashed" />
+        <div className="h-12 bg-white rounded border border-dashed" />
+        <div className="h-12 bg-white rounded border border-dashed" />
+      </div>
+
       {/* 4. 후보 일꾼 리스트 */}
       <div className="flex-1 overflow-y-auto space-y-3 mb-4">
         {candidates.length > 0
@@ -142,11 +148,12 @@ export default function DispatchMissionView({
                   <input
                     type="range"
                     min="0"
-                    max={w.count}             // full owns
+                    max={w.count}
                     value={sel}
                     onChange={e => onSlide(w.key, e.target.value)}
                     onPointerDown={e => onPointerDown(e, w.key)}
                     onTouchStart={e => onPointerDown(e, w.key)}
+                    className="w-full"
                   />
                 </div>
               )
