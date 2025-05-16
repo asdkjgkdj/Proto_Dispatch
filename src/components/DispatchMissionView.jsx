@@ -273,22 +273,26 @@ export default function DispatchMissionView({
               })}
             </div>
 
-            {/* ─── CEO 목록 3×3 (스크롤 컨테이너 추가) ─── */}
-<div className="max-h-48 overflow-y-auto mb-4">
-  <div className="grid grid-cols-3 gap-3">
-    {ceos.map(ceo => {
-      const isEquipped = slots.includes(ceo.key)
-      const isSelected = pendingCEO === ceo.key
-      return (
-        <div
-          key={ceo.key}
-          onClick={() => setPendingCEO(ceo.key)}
-          className={`
-            bg-gray-100 p-2 rounded shadow flex flex-col items-center cursor-pointer
-            ${isEquipped ? 'opacity-50 cursor-not-allowed' : ''}
-            ${isSelected ? 'ring-2 ring-blue-500' : ''}
-          `}
-        >
+            +            {/* ─── CEO 목록 3×3 (스크롤 가능) ─── */}
+            <div className="max-h-40 overflow-y-auto mb-4">
+              <div className="grid grid-cols-3 gap-3">
+                {ceos
+                  // 이미 다른 슬롯에 장착된 CEO는 제외
+                  .filter(c => c.key === pendingCEO || !slots.includes(c.key))
+                  .map(ceo => {
+                     const isEquipped = slots.includes(ceo.key)
+                     const isSelected = pendingCEO === ceo.key
+                     return (
+                       <div
+                         key={ceo.key}
+                         onClick={() => setPendingCEO(ceo.key)}
+                         className={`
+                           bg-gray-100 p-2 rounded shadow flex flex-col items-center cursor-pointer
+                           ${isEquipped ? 'opacity-50 cursor-not-allowed' : ''}
+                           ${isSelected ? 'ring-2 ring-blue-500' : ''}
+                         `}
+                       >
+        
           {/* 직종 아이콘 */}
           <img
             src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
