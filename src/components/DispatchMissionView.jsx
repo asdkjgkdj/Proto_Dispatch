@@ -25,7 +25,7 @@ const CEO_POOL = [
 // 직종 → 아이콘 파일명 매핑
 const OCC_ICON = {
   '기술지원': 'Technology',
-  '자원운영': 'Resource',
+  '자원운영': 'Resources',
   '현장보호': 'Field',
 }
 
