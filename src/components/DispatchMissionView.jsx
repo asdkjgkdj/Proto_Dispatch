@@ -273,51 +273,53 @@ export default function DispatchMissionView({
               })}
             </div>
 
-            {/* CEO 목록 3×3 */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {ceos.map(ceo => {
-                const isEquipped = slots.includes(ceo.key)
-                const isSelected = pendingCEO === ceo.key
-                return (
-                  <div
-                    key={ceo.key}
-                    onClick={() => setPendingCEO(ceo.key)}
-                    className={`
-                      bg-gray-100 p-2 rounded shadow flex flex-col items-center cursor-pointer
-                      ${isEquipped ? 'opacity-50 cursor-not-allowed' : ''}
-                      ${isSelected ? 'ring-2 ring-blue-500' : ''}
-                    `}
-                  >
-                    {/* 직종 아이콘 */}
-                    <img
-                      src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
-                      className="w-3 h-3 mb-0"
-                      alt={ceo.role}
-                    />
-                    {/* Lv */}
-                    <div className="text-xs mb-1">Lv.{ceo.level}</div>
-                    {/* 이미지 */}
-                    <img
-                      src={`/images/ceo/${ceo.key}.png`}
-                      className="w-8 h-8 mb-1"
-                      alt={ceo.name}
-                    />
-                    {/* 파견능력 */}
-                    <div className="flex items-center text-xs">
-                      <img
-                        src="/images/dispatch_ability.png"
-                        className="w-4 h-4 mr-1"
-                        alt="power"
-                      />
-                      <span>{ceo.power}</span>
-                    </div>
-                    {isEquipped && (
-                      <div className="mt-1 text-red-500 text-xs">파견중</div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+            {/* ─── CEO 목록 3×3 (스크롤 컨테이너 추가) ─── */}
+<div className="max-h-48 overflow-y-auto mb-4">
+  <div className="grid grid-cols-3 gap-3">
+    {ceos.map(ceo => {
+      const isEquipped = slots.includes(ceo.key)
+      const isSelected = pendingCEO === ceo.key
+      return (
+        <div
+          key={ceo.key}
+          onClick={() => setPendingCEO(ceo.key)}
+          className={`
+            bg-gray-100 p-2 rounded shadow flex flex-col items-center cursor-pointer
+            ${isEquipped ? 'opacity-50 cursor-not-allowed' : ''}
+            ${isSelected ? 'ring-2 ring-blue-500' : ''}
+          `}
+        >
+          {/* 직종 아이콘 */}
+          <img
+            src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
+            className="w-3 h-3 mb-0"
+            alt={ceo.role}
+          />
+          {/* Lv */}
+          <div className="text-xs mb-1">Lv.{ceo.level}</div>
+          {/* 이미지 */}
+          <img
+            src={`/images/ceo/${ceo.key}.png`}
+            className="w-8 h-8 mb-1"
+            alt={ceo.name}
+          />
+          {/* 파견능력 */}
+          <div className="flex items-center text-xs">
+            <img
+              src="/images/dispatch_ability.png"
+              className="w-4 h-4 mr-1"
+              alt="power"
+            />
+            <span>{ceo.power}</span>
+          </div>
+          {isEquipped && (
+            <div className="mt-1 text-red-500 text-xs">파견중</div>
+          )}
+        </div>
+      )
+    })}
+  </div>
+</div>
 
             {/* 보기 + 파견/중지 버튼 */}
             <div className="mt-4 flex space-x-2">
