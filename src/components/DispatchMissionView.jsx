@@ -1,3 +1,10 @@
+// ★ 컴포넌트 최상단에 한 번만 선언
+ const DURATION_TEXT = {
+     1: '10초',
+     2: '30초',
+     3: '1분',
+   };
+
 // src/components/DispatchMissionView.jsx
 import React, { useState } from 'react'
 import { Button } from './ui/button'
@@ -22,6 +29,7 @@ const CEO_POOL = [
   { key: 'fld5',  name: '보안CEO',    role: '현장보호', power: 50, level: 5 },
 ]
 
+
 // 직종 → 아이콘 파일명 매핑
 const OCC_ICON = {
   '기술지원': 'Technology',
@@ -30,12 +38,15 @@ const OCC_ICON = {
 }
 
 export default function DispatchMissionView({
-  params,              // { key, name, power, staminaNeed, roles }
-  availableStamina,
-  trainedWorkers = [], // [{ key, label, count }]
-  onBack
-}) {
-  const { power: needPower, staminaNeed, roles } = params
+     params,              // { key, name, power, staminaNeed, roles, difficulty }
+      availableStamina,
+      trainedWorkers = [],
+      onBack
+    }) {
+    
+ // ─── 파견 시간 계산 & params 분해 ─────────────────────────
+  const { power: needPower, staminaNeed, roles, stars } = params
+  const durationText = DURATION_TEXT[stars] || ''
   const maxDispatch = 1 * 10
 
   // 추천된 직종의 일꾼만
@@ -237,6 +248,17 @@ const canDispatch =
           </div>
         )}
       </div>
+
+        {/* ─── 파견 시간 ───────────────────────── */}
+    {/* ─── 파견 시간 ───────────────────────── */}
+     <div className="flex items-center justify-center mb-2 text-sm text-gray-700">
+       <img
+         src="/images/Time_Icon.png"
+         alt="time"
+         className="w-4 h-4 mr-1"
+       />
+       <span>소요 시간: {durationText}</span>
+     </div>
 
       {/* 6. 파견 버튼 */}
       <Button

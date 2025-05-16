@@ -30,12 +30,12 @@ export default function DispatchListView({
   availableStamina,
   gems,
   onRefresh,
-  onDispatchStart,
+  onDispatchStart,   // PhoneFrame 의 콜백
 }) {
   const [selected, setSelected] = useState(null)
   const [detail,   setDetail]   = useState(null)
 
-  const openDetail = comp => {
+  function openDetail(comp) {
     // 1~3개 직종 랜덤
     const roles = ROLES
       .sort(() => 0.5 - Math.random())
@@ -56,8 +56,13 @@ export default function DispatchListView({
     })
   }
 
-  const dispatch = () => {
-    onDispatchStart({ ...selected, ...detail })
+  function dispatch() {
+    // PhoneFrame 으로 정보 전달 → 뷰 전환
+    onDispatchStart({
+      ...selected,
+      ...detail,
+    })
+    // 팝업 닫기
     setSelected(null)
   }
 
@@ -133,7 +138,6 @@ export default function DispatchListView({
 
             {/* 보상 레이블 */}
             <div className="font-medium mb-1">보상</div>
-            {/* 보상 박스 */}
             <div className="flex justify-around mb-3">
               <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
                 <img
@@ -165,6 +169,7 @@ export default function DispatchListView({
               <span className="ml-1 font-semibold">{detail.staminaNeed}</span>
             </p>
 
+            {/* 선택 → PhoneFrame 의 onDispatchStart 호출 */}
             <Button
               className="w-full bg-green-400 text-white font-bold py-2"
               onClick={dispatch}
