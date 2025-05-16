@@ -61,11 +61,14 @@ export default function DispatchMissionView({
   // 현재 파견 능력 = 일꾼수 + CEO 파워
   const selectedPower = totalSelected + ceoPower
 
-  const canDispatch = 
-    selectedPower >= needPower &&
-    availableStamina >= staminaNeed &&
-    totalSelected > 0 &&
-    totalSelected <= maxDispatch
+  // totalSelected: 일꾼 수, slots.filter(...) : 장착된 CEO 수
+const totalPersons = totalSelected + slots.filter(k => k).length
+
+const canDispatch = 
+  selectedPower >= needPower &&
+  availableStamina >= staminaNeed &&
+  totalPersons > 0 &&
+  totalPersons <= maxDispatch
 
   const [toastMessage, setToastMessage] = useState('')
   const showToast = msg => {
@@ -133,14 +136,20 @@ export default function DispatchMissionView({
           <div className="text-lg font-bold">{needPower}</div>
         </div>
       </div>
-      <div className="text-center mb-2 text-sm text-gray-700">
-        ({totalSelected} / {maxDispatch}명)
-      </div>
-      <div className="text-center mb-4">
-        {canDispatch
-          ? <span className="text-blue-500">파견이 가능합니다.</span>
-          : <span className="text-red-500">파견이 불가능합니다.</span>}
-      </div>
+      {/* 2-1. 파견 인원 카운터 (일꾼 + CEO) */}
+<div className="text-center mb-2 text-sm text-gray-700">
+  ({totalSelected + slots.filter(k => k).length} / {maxDispatch}명)
+</div>
+{/* 2-2. 파견 가능 여부 문구 (능력치 비교 포함) */}
+<div className="text-center mb-4">
+  {selectedPower >= needPower
+    ? <span className="text-blue-500">
+        파견이 가능합니다.
+      </span>
+    : <span className="text-red-500">
+        파견이 불가능합니다.
+      </span>}
+</div>
 
       {/* 3. 추천 직종 */}
       <div className="mb-4 text-sm">
