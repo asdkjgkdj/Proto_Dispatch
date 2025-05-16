@@ -1,14 +1,14 @@
-// ★ 컴포넌트 최상단에 한 번만 선언
- const DURATION_TEXT = {
-     1: '10초',
-     2: '30초',
-     3: '1분',
-   };
-
 // src/components/DispatchMissionView.jsx
 import React, { useState } from 'react'
 import { Button } from './ui/button'
 import Toast from './ui/Toast'
+
+// 난이도★별 소요 시간 텍스트 매핑
+const DURATION_TEXT = {
+  1: '10초',
+  2: '30초',
+  3: '1분',
+}
 
 // 미리 정의된 CEO 풀 (직종별 5명씩)
 const CEO_POOL = [
@@ -29,7 +29,6 @@ const CEO_POOL = [
   { key: 'fld5',  name: '보안CEO',    role: '현장보호', power: 50, level: 5 },
 ]
 
-
 // 직종 → 아이콘 파일명 매핑
 const OCC_ICON = {
   '기술지원': 'Technology',
@@ -38,55 +37,40 @@ const OCC_ICON = {
 }
 
 export default function DispatchMissionView({
-     params,              // { key, name, power, staminaNeed, roles, difficulty }
-      availableStamina,
-      trainedWorkers = [],
-      onBack
-    }) {
-    
- // ─── 파견 시간 계산 & params 분해 ─────────────────────────
+  params,              // { key, name, power, staminaNeed, roles, stars }
+  availableStamina,
+  trainedWorkers = [], // [{ key, label, count }]
+  onBack,
+}) {
+  // ─── params 분해 & 파견 시간 계산 ─────────────────────────
   const { power: needPower, staminaNeed, roles, stars } = params
   const durationText = DURATION_TEXT[stars] || ''
-  const maxDispatch = 1 * 10
+  const maxDispatch = 10
 
-  // 추천된 직종의 일꾼만
+  // 추천된 직종의 일꾼만 필터링
   const candidates = trainedWorkers.filter(w =>
     roles.some(r => w.label.includes(r))
   )
+
+  // 선택된 일꾼 수 상태
   const [selections, setSelections] = useState(
     candidates.map(w => ({ key: w.key, count: 0 }))
   )
-  const totalSelected = selections.reduce((s, x) => s + x.count, 0)
+  const totalSelected = selections.reduce((sum, s) => sum + s.count, 0)
 
   // CEO 슬롯 & 팝업 상태
   const [slots, setSlots]           = useState([null, null, null])
-  const [slotIdx, setSlotIdx]       = useState(null)      // 편집 중인 슬롯
-  const [pendingCEO, setPendingCEO] = useState(null)      // 팝업 내 선택 CEO
+  const [slotIdx, setSlotIdx]       = useState(null)
+  const [pendingCEO, setPendingCEO] = useState(null)
 
-  // 장착된 CEO 파워 합산
-  const ceoPower = slots
-    .filter(k => k)
-    .map(k => CEO_POOL.find(c => c.key === k).power)
-    .reduce((a, b) => a + b, 0)
-
-  // 현재 파견 능력 = 일꾼수 + CEO 파워
-  const selectedPower = totalSelected + ceoPower
-
-  // totalSelected: 일꾼 수, slots.filter(...) : 장착된 CEO 수
-const totalPersons = totalSelected + slots.filter(k => k).length
-
-const canDispatch = 
-  selectedPower >= needPower &&
-  availableStamina >= staminaNeed &&
-  totalPersons > 0 &&
-  totalPersons <= maxDispatch
-
+  // 토스트 메시지
   const [toastMessage, setToastMessage] = useState('')
   const showToast = msg => {
     setToastMessage(msg)
     setTimeout(() => setToastMessage(''), 1500)
   }
 
+  // 일꾼 슬라이더 핸들러
   const findWorkerCount = key =>
     candidates.find(w => w.key === key)?.count || 0
 
@@ -101,6 +85,7 @@ const canDispatch =
     ))
   }
 
+  // CEO 선택 팝업 핸들러
   const openSelector = idx => {
     setSlotIdx(idx)
     setPendingCEO(slots[idx])
@@ -109,12 +94,10 @@ const canDispatch =
     setSlotIdx(null)
     setPendingCEO(null)
   }
-
-  // 토글 장착/중지
   const handleEquip = () => {
     const next = [...slots]
     if (slots[slotIdx] === pendingCEO) {
-      next[slotIdx] = null    // 이미 장착된 CEO면 해제
+      next[slotIdx] = null
     } else if (pendingCEO) {
       next[slotIdx] = pendingCEO
     }
@@ -122,7 +105,21 @@ const canDispatch =
     setPendingCEO(null)
   }
 
-  // 해당 직종 CEO만
+  // 장착된 CEO 파워 합산
+  const ceoPower = slots.filter(k => k)
+    .map(k => CEO_POOL.find(c => c.key === k).power)
+    .reduce((a, b) => a + b, 0)
+
+  // 파견 가능 여부 계산
+  const totalPersons = totalSelected + slots.filter(k => k).length
+  const selectedPower = totalSelected + ceoPower
+  const canDispatch =
+    selectedPower >= needPower &&
+    availableStamina >= staminaNeed &&
+    totalPersons > 0 &&
+    totalPersons <= maxDispatch
+
+  // 해당 직종 CEO만 선택
   const ceos = CEO_POOL.filter(c => roles.includes(c.role))
 
   return (
@@ -147,20 +144,16 @@ const canDispatch =
           <div className="text-lg font-bold">{needPower}</div>
         </div>
       </div>
-      {/* 2-1. 파견 인원 카운터 (일꾼 + CEO) */}
-<div className="text-center mb-2 text-sm text-gray-700">
-  ({totalSelected + slots.filter(k => k).length} / {maxDispatch}명)
-</div>
-{/* 2-2. 파견 가능 여부 문구 (능력치 비교 포함) */}
-<div className="text-center mb-4">
-  {selectedPower >= needPower
-    ? <span className="text-blue-500">
-        파견이 가능합니다.
-      </span>
-    : <span className="text-red-500">
-        파견이 불가능합니다.
-      </span>}
-</div>
+      {/* 2-1. 파견 인원 */}
+      <div className="text-center mb-2 text-sm text-gray-700">
+        ({totalPersons} / {maxDispatch}명)
+      </div>
+      {/* 2-2. 파견 가능 여부 */}
+      <div className="text-center mb-4">
+        {selectedPower >= needPower
+          ? <span className="text-blue-500">파견이 가능합니다.</span>
+          : <span className="text-red-500">파견이 불가능합니다.</span>}
+      </div>
 
       {/* 3. 추천 직종 */}
       <div className="mb-4 text-sm">
@@ -180,36 +173,31 @@ const canDispatch =
                 ${!ceo ? 'border-2 border-dashed border-gray-300' : ''}
               `}
             >
-              {!ceo ? (
-                <span className="text-2xl text-gray-400">＋</span>
-              ) : (
-                <>
-                  {/* 직종 아이콘 */}
-                  <img
-                    src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
-                    className="w-4 h-4 mb-1"
-                    alt={ceo.role}
-                  />
-                  {/* Lv */}
-                  <div className="text-xs mb-1">Lv.{ceo.level}</div>
-                  {/* 이미지 */}
-                  <img
-                    src={`/images/ceo/${ceo.key}.png`}
-                    className="w-12 h-12 mb-1"
-                    alt={ceo.name}
-                  />
-                  {/* 파견능력 */}
-                  <div className="flex items-center text-xs">
+              {!ceo
+                ? <span className="text-2xl text-gray-400">＋</span>
+                : <>
                     <img
-                      src="/images/dispatch_ability.png"
-                      className="w-4 h-4 mr-1"
-                      alt="power"
+                      src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
+                      className="w-4 h-4 absolute top-2 left-2"
+                      alt={ceo.role}
                     />
-                    <span>{ceo.power}</span>
-                  </div>
-                  <div className="text-red-500 text-xs mt-1">파견중</div>
-                </>
-              )}
+                    <div className="text-xs mb-1">Lv.{ceo.level}</div>
+                    <img
+                      src={`/images/ceo/${ceo.key}.png`}
+                      className="w-12 h-12 mb-1"
+                      alt={ceo.name}
+                    />
+                    <div className="flex items-center text-xs">
+                      <img
+                        src="/images/dispatch_ability.png"
+                        className="w-4 h-4 mr-1"
+                        alt="power"
+                      />
+                      <span>{ceo.power}</span>
+                    </div>
+                    <div className="text-red-500 text-xs mt-1">파견중</div>
+                  </>
+              }
             </div>
           )
         })}
@@ -217,7 +205,7 @@ const canDispatch =
 
       {/* 5. 일꾼 리스트 */}
       <div className="flex-1 overflow-y-auto space-y-3 mb-4">
-        {candidates.length > 0 ? candidates.map(w => {
+        {candidates.map(w => {
           const sel = selections.find(s => s.key === w.key).count
           return (
             <div key={w.key} className="bg-white p-2 rounded shadow">
@@ -228,9 +216,7 @@ const canDispatch =
                   alt={w.label}
                 />
                 <span className="font-medium">{w.label}</span>
-                <span className="ml-auto text-sm text-gray-600">
-                  {sel}/{w.count}
-                </span>
+                <span className="ml-auto text-sm text-gray-600">{sel}/{w.count}</span>
               </div>
               <input
                 type="range"
@@ -242,31 +228,30 @@ const canDispatch =
               />
             </div>
           )
-        }) : (
-          <div className="text-center text-gray-500">
-            추천된 직종의 일꾼이 없습니다.
-          </div>
-        )}
+        })}
       </div>
 
-        {/* ─── 파견 시간 ───────────────────────── */}
-    {/* ─── 파견 시간 ───────────────────────── */}
-     <div className="flex items-center justify-center mb-2 text-sm text-gray-700">
-       <img
-         src="/images/Time_Icon.png"
-         alt="time"
-         className="w-4 h-4 mr-1"
-       />
-       <span>소요 시간: {durationText}</span>
-     </div>
+      {/* ─── 파견 시간 ───────────────────────── */}
+      <div className="flex items-center justify-center mb-2 text-sm text-gray-700">
+        <img src="/images/Time_Icon.png" alt="time" className="w-4 h-4 mr-1" />
+        <span>소요 시간: {durationText}</span>
+      </div>
 
       {/* 6. 파견 버튼 */}
       <Button
         className={`w-full py-2 font-bold ${canDispatch ? 'bg-green-500' : 'bg-gray-300'}`}
         disabled={!canDispatch}
-        onClick={() => alert('파견을 시작합니다!')}
+        onClick={() => {
+          // 스태미너 차감은 PhoneFrame 쪽에서 관리됩니다
+          onBack()
+        }}
       >
-        파견 ({staminaNeed}⚡)
+        <img
+          src="/images/stamina_icon.png"
+          alt="stamina"
+          className="inline w-4 h-4 align-text-bottom mr-1"
+        />
+        파견 ({staminaNeed})
       </Button>
 
       {/* 7. CEO 선택 팝업 */}
@@ -304,57 +289,49 @@ const canDispatch =
               })}
             </div>
 
-            +            {/* ─── CEO 목록 3×3 (스크롤 가능) ─── */}
+            {/* CEO 목록 (스크롤 가능) */}
             <div className="max-h-40 overflow-y-auto mb-4">
               <div className="grid grid-cols-3 gap-3">
                 {ceos
-                  // 이미 다른 슬롯에 장착된 CEO는 제외
                   .filter(c => c.key === pendingCEO || !slots.includes(c.key))
                   .map(ceo => {
-                     const isEquipped = slots.includes(ceo.key)
-                     const isSelected = pendingCEO === ceo.key
-                     return (
-                       <div
-                         key={ceo.key}
-                         onClick={() => setPendingCEO(ceo.key)}
-                         className={`
-                           bg-gray-100 p-2 rounded shadow flex flex-col items-center cursor-pointer
-                           ${isEquipped ? 'opacity-50 cursor-not-allowed' : ''}
-                           ${isSelected ? 'ring-2 ring-blue-500' : ''}
-                         `}
-                       >
-        
-          {/* 직종 아이콘 */}
-          <img
-            src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
-            className="w-3 h-3 mb-0"
-            alt={ceo.role}
-          />
-          {/* Lv */}
-          <div className="text-xs mb-1">Lv.{ceo.level}</div>
-          {/* 이미지 */}
-          <img
-            src={`/images/ceo/${ceo.key}.png`}
-            className="w-8 h-8 mb-1"
-            alt={ceo.name}
-          />
-          {/* 파견능력 */}
-          <div className="flex items-center text-xs">
-            <img
-              src="/images/dispatch_ability.png"
-              className="w-4 h-4 mr-1"
-              alt="power"
-            />
-            <span>{ceo.power}</span>
-          </div>
-          {isEquipped && (
-            <div className="mt-1 text-red-500 text-xs">파견중</div>
-          )}
-        </div>
-      )
-    })}
-  </div>
-</div>
+                    const isEquipped = slots.includes(ceo.key)
+                    const isSelected = pendingCEO === ceo.key
+                    return (
+                      <div
+                        key={ceo.key}
+                        onClick={() => setPendingCEO(ceo.key)}
+                        className={`
+                          bg-gray-100 p-2 rounded shadow flex flex-col items-center cursor-pointer
+                          ${isEquipped ? 'opacity-50 cursor-not-allowed' : ''}
+                          ${isSelected ? 'ring-2 ring-blue-500' : ''}
+                        `}
+                      >
+                        <img
+                          src={`/images/occupation/${OCC_ICON[ceo.role]}.png`}
+                          className="w-3 h-3 mb-0"
+                          alt={ceo.role}
+                        />
+                        <div className="text-xs mb-1">Lv.{ceo.level}</div>
+                        <img
+                          src={`/images/ceo/${ceo.key}.png`}
+                          className="w-8 h-8 mb-1"
+                          alt={ceo.name}
+                        />
+                        <div className="flex items-center text-xs">
+                          <img
+                            src="/images/dispatch_ability.png"
+                            className="w-4 h-4 mr-1"
+                            alt="power"
+                          />
+                          <span>{ceo.power}</span>
+                        </div>
+                        {isEquipped && <div className="mt-1 text-red-500 text-xs">파견중</div>}
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
 
             {/* 보기 + 파견/중지 버튼 */}
             <div className="mt-4 flex space-x-2">
@@ -370,12 +347,10 @@ const canDispatch =
               </Button>
             </div>
 
-            {/* 토스트 */}
             {toastMessage && <Toast>{toastMessage}</Toast>}
           </div>
         </div>
       )}
-
     </div>
   )
 }

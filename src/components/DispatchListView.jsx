@@ -30,18 +30,17 @@ export default function DispatchListView({
   availableStamina,
   gems,
   onRefresh,
-  onDispatchStart,   // PhoneFrame 의 콜백
+  onDispatchStart,    // PhoneFrame 의 콜백
+  dispatchedCompanies = [],  // **추가된 prop**
 }) {
   const [selected, setSelected] = useState(null)
   const [detail,   setDetail]   = useState(null)
 
   function openDetail(comp) {
-    // 1~3개 직종 랜덤
     const roles = ROLES
       .sort(() => 0.5 - Math.random())
       .slice(0, Math.floor(Math.random()*3) + 1)
 
-    // stars 기반 범위에서 랜덤 파견능력
     const cfg = STAR_CONFIG[comp.stars]
     const [min, max] = cfg.range
     const power = Math.floor(Math.random() * (max - min + 1)) + min
@@ -57,12 +56,10 @@ export default function DispatchListView({
   }
 
   function dispatch() {
-    // PhoneFrame 으로 정보 전달 → 뷰 전환
     onDispatchStart({
       ...selected,
       ...detail,
     })
-    // 팝업 닫기
     setSelected(null)
   }
 
@@ -87,20 +84,31 @@ export default function DispatchListView({
 
       {/* 2. 회사 그리드 */}
       <div className="grid grid-cols-3 gap-3 flex-1 overflow-auto mb-3">
-        {COMPANIES.map(c => (
-          <div
-            key={c.key}
-            onClick={() => openDetail(c)}
-            className="bg-white p-3 rounded shadow cursor-pointer hover:shadow-lg flex flex-col items-center"
-          >
-            <div className="text-center font-medium">{c.name}</div>
-            <div className="mt-1">
-              {Array.from({ length: c.stars }).map((_, i) => (
-                <span key={i} className="text-yellow-500 text-xl">★</span>
-              ))}
+        {COMPANIES.map(c => {
+          const isDispatched = dispatchedCompanies.includes(c.key)
+          return (
+            <div
+              key={c.key}
+              onClick={() => !isDispatched && openDetail(c)}
+              className={`
+                bg-white p-3 rounded shadow flex flex-col items-center
+                ${isDispatched
+                  ? 'opacity-50 cursor-default'
+                  : 'cursor-pointer hover:shadow-lg'}
+              `}
+            >
+              <div className="text-center font-medium">{c.name}</div>
+              <div className="mt-1">
+                {Array.from({ length: c.stars }).map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              {isDispatched && (
+                <div className="mt-2 text-red-500 font-semibold">파견중</div>
+              )}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* 3. 새로고침 버튼 */}
@@ -171,9 +179,14 @@ export default function DispatchListView({
 
             {/* 선택 → PhoneFrame 의 onDispatchStart 호출 */}
             <Button
-              className="w-full bg-green-400 text-white font-bold py-2"
+              className="w-full bg-green-400 text-white font-bold py-2 flex items-center justify-center"
               onClick={dispatch}
             >
+              <img
+                src="/images/stamina_icon.png"
+                alt="stamina"
+                className="w-4 h-4 mr-1"
+              />
               선택
             </Button>
           </div>
