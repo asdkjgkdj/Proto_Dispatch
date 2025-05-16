@@ -7,7 +7,7 @@ import RechargeView        from './RechargeView.jsx'
 import DispatchMissionView from './DispatchMissionView.jsx'
 
 export default function PhoneFrame() {
-  // 전체 앱 상태: 'home' | 'list' | 'train' | 'recharge' | 'mission'
+  // 전체 앱 상태
   const [view, setView] = useState({ type: 'home', building: null, company: null })
 
   // 리소스 상태
@@ -41,7 +41,7 @@ export default function PhoneFrame() {
     setView({ type: 'list', building: null, company: null })
   }
 
-  // 훈련 완료 → trainedWorkers 누적, 스태미너 차감 (TrainingView에서 직접 호출)
+  // 훈련 완료
   function handleTrain(level, count) {
     setStamina(s => s - 10)
     setTrainedWorkers(ws => {
@@ -50,10 +50,7 @@ export default function PhoneFrame() {
         const updated = { ...ws[idx], count: ws[idx].count + count }
         return [...ws.slice(0, idx), updated, ...ws.slice(idx + 1)]
       } else {
-        return [
-          ...ws,
-          { key: view.building.key, label: view.building.label, count }
-        ]
+        return [...ws, { key: view.building.key, label: view.building.label, count }]
       }
     })
   }

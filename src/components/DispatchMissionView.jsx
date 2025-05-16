@@ -41,6 +41,7 @@ export default function DispatchMissionView({
   availableStamina,
   trainedWorkers = [], // [{ key, label, count }]
   onBack,
+  onDispatchConfirm    // ← PhoneFrame에서 내려주는 콜백
 }) {
   // ─── params 분해 & 파견 시간 계산 ─────────────────────────
   const { power: needPower, staminaNeed, roles, stars } = params
@@ -242,9 +243,10 @@ export default function DispatchMissionView({
         className={`w-full py-2 font-bold ${canDispatch ? 'bg-green-500' : 'bg-gray-300'}`}
         disabled={!canDispatch}
         onClick={() => {
-          // 스태미너 차감은 PhoneFrame 쪽에서 관리됩니다
-          onBack()
-        }}
+        
+                  // 1) 스태미너 차감 + 파견 등록
+                  onDispatchConfirm(params.key, staminaNeed)
+                }}
       >
         <img
           src="/images/stamina_icon.png"

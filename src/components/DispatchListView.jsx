@@ -30,17 +30,19 @@ export default function DispatchListView({
   availableStamina,
   gems,
   onRefresh,
-  onDispatchStart,    // PhoneFrame 의 콜백
-  dispatchedCompanies = [],  // **추가된 prop**
+  onDispatchStart,        // PhoneFrame 의 콜백
+  dispatchedCompanies,    // 파견중인 회사 키 목록
 }) {
   const [selected, setSelected] = useState(null)
   const [detail,   setDetail]   = useState(null)
 
   function openDetail(comp) {
+    // 1~3개 직종 랜덤
     const roles = ROLES
       .sort(() => 0.5 - Math.random())
       .slice(0, Math.floor(Math.random()*3) + 1)
 
+    // stars 기반 범위에서 랜덤 파견능력
     const cfg = STAR_CONFIG[comp.stars]
     const [min, max] = cfg.range
     const power = Math.floor(Math.random() * (max - min + 1)) + min
@@ -67,9 +69,7 @@ export default function DispatchListView({
     <div className="relative w-full h-full bg-yellow-50 flex flex-col p-3">
       {/* 1. 헤더 */}
       <header className="flex items-center justify-between mb-3">
-        <Button onClick={onBack} className="px-3 py-1">
-          ← 뒤로
-        </Button>
+        <Button onClick={onBack} className="px-3 py-1">← 뒤로</Button>
         <div className="flex space-x-2">
           <div className="flex items-center bg-white px-2 py-1 rounded-full">
             <img src="/images/gem_icon.png" alt="gem" className="w-4 h-4 mr-1"/>
@@ -92,9 +92,7 @@ export default function DispatchListView({
               onClick={() => !isDispatched && openDetail(c)}
               className={`
                 bg-white p-3 rounded shadow flex flex-col items-center
-                ${isDispatched
-                  ? 'opacity-50 cursor-default'
-                  : 'cursor-pointer hover:shadow-lg'}
+                ${isDispatched ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg'}
               `}
             >
               <div className="text-center font-medium">{c.name}</div>
@@ -104,7 +102,7 @@ export default function DispatchListView({
                 ))}
               </div>
               {isDispatched && (
-                <div className="mt-2 text-red-500 font-semibold">파견중</div>
+                <div className="mt-2 text-sm text-red-500">파견중</div>
               )}
             </div>
           )
@@ -129,9 +127,7 @@ export default function DispatchListView({
             <button
               onClick={() => setSelected(null)}
               className="absolute top-2 right-2 text-gray-600"
-            >
-              ✕
-            </button>
+            >✕</button>
 
             <h3 className="text-center text-lg font-bold mb-2">
               {selected.name} 파견
@@ -148,20 +144,12 @@ export default function DispatchListView({
             <div className="font-medium mb-1">보상</div>
             <div className="flex justify-around mb-3">
               <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
-                <img
-                  src="/images/reward/stone.png"
-                  alt="stone"
-                  className="w-8 h-8 mb-1"
-                />
+                <img src="/images/reward/stone.png" alt="stone" className="w-8 h-8 mb-1"/>
                 <span className="text-sm">강화석</span>
                 <span className="font-semibold">{detail.stone}</span>
               </div>
               <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
-                <img
-                  src="/images/reward/piece.png"
-                  alt="piece"
-                  className="w-8 h-8 mb-1"
-                />
+                <img src="/images/reward/piece.png" alt="piece" className="w-8 h-8 mb-1"/>
                 <span className="text-sm">조각</span>
                 <span className="font-semibold">{detail.piece}</span>
               </div>
@@ -169,25 +157,16 @@ export default function DispatchListView({
 
             <p className="text-sm mb-4">
               필요 스태미너:{' '}
-              <img
-                src="/images/stamina_icon.png"
-                alt="stamina"
-                className="inline w-4 h-4 align-text-bottom"
-              />
+              <img src="/images/stamina_icon.png" alt="stamina" className="inline w-4 h-4 align-text-bottom"/>
               <span className="ml-1 font-semibold">{detail.staminaNeed}</span>
             </p>
 
-            {/* 선택 → PhoneFrame 의 onDispatchStart 호출 */}
             <Button
               className="w-full bg-green-400 text-white font-bold py-2 flex items-center justify-center"
               onClick={dispatch}
             >
-              <img
-                src="/images/stamina_icon.png"
-                alt="stamina"
-                className="w-4 h-4 mr-1"
-              />
-              선택
+              <img src="/images/stamina_icon.png" alt="stamina" className="w-4 h-4 mr-1"/>
+              <span>파견 ({detail.staminaNeed})</span>
             </Button>
           </div>
         </div>
