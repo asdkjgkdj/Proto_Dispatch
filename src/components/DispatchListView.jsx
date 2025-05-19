@@ -1,5 +1,5 @@
 // src/components/DispatchListView.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 
 // 추천 직종
@@ -31,10 +31,27 @@ export default function DispatchListView({
   gems,
   onRefresh,
   onDispatchStart,        // PhoneFrame 의 콜백
-  dispatchedCompanies,    // 파견중인 회사 키 목록
+  dispatchedCompanies,    // { key: number, remaining: number }[]
 }) {
+  // 상세 팝업 상태
   const [selected, setSelected] = useState(null)
   const [detail,   setDetail]   = useState(null)
+
+  // 로컬 타이머 상태 동기화
+  const [timers, setTimers] = useState(dispatchedCompanies)
+  useEffect(() => {
+    setTimers(dispatchedCompanies)
+  }, [dispatchedCompanies])
+
+  // 1초마다 remaining 카운트다운
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTimers(t =>
+        t.map(x => ({ key: x.key, remaining: Math.max(0, x.remaining - 1) }))
+      )
+    }, 1000)
+    return () => clearInterval(id)
+  }, [])
 
   function openDetail(comp) {
     // 1~3개 직종 랜덤
@@ -54,6 +71,7 @@ export default function DispatchListView({
       stone: cfg.stone,
       piece: cfg.piece,
       staminaNeed: 10,
+      stars: comp.stars,
     })
   }
 
@@ -85,7 +103,10 @@ export default function DispatchListView({
       {/* 2. 회사 그리드 */}
       <div className="grid grid-cols-3 gap-3 flex-1 overflow-auto mb-3">
         {COMPANIES.map(c => {
-          const isDispatched = dispatchedCompanies.includes(c.key)
+          const timerObj = timers.find(t => t.key === c.key)
+          const isDispatched = !!timerObj
+          const rem = timerObj?.remaining ?? 0
+
           return (
             <div
               key={c.key}
@@ -101,8 +122,18 @@ export default function DispatchListView({
                   <span key={i} className="text-yellow-500 text-xl">★</span>
                 ))}
               </div>
+
               {isDispatched && (
-                <div className="mt-2 text-sm text-red-500">파견중</div>
+                <>
+                  <div className="mt-2 text-sm text-red-500">
+                    {rem > 0 ? '파견중' : '파견 완료'}
+                  </div>
+                  {rem > 0 && (
+                    <div className="text-xs text-gray-600 mt-1">
+                      남은 시간: {rem}s
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )
@@ -157,7 +188,11 @@ export default function DispatchListView({
 
             <p className="text-sm mb-4">
               필요 스태미너:{' '}
-              <img src="/images/stamina_icon.png" alt="stamina" className="inline w-4 h-4 align-text-bottom"/>
+              <img
+                src="/images/stamina_icon.png"
+                alt="stamina"
+                className="inline w-4 h-4 align-text-bottom"
+              />
               <span className="ml-1 font-semibold">{detail.staminaNeed}</span>
             </p>
 
