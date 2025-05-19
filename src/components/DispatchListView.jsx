@@ -121,7 +121,9 @@ export default function DispatchListView({
         {COMPANIES.map(c => {
           const t = timers.find(x => x.key === c.key)
           const rem = t?.remaining ?? 0
-          const isDispatched = !!t
+          const isDispatched = !!t      // true if ever dispatched
+           const isInProgress = rem > 0  // true while remaining>0
+
 
           return (
             <div
@@ -131,11 +133,11 @@ export default function DispatchListView({
                 else if (rem === 0) openReward(c.key)
               }}
               className={`
-                bg-white p-3 rounded shadow flex flex-col items-center
-                ${isDispatched
-                  ? 'opacity-50'
-                  : 'cursor-pointer hover:shadow-lg'}
-              `}
+                       bg-white p-3 rounded shadow flex flex-col items-center
+                       ${isInProgress
+                         ? 'opacity-50 cursor-not-allowed'       // dispatch 중인 경우만
+                         : 'cursor-pointer hover:shadow-lg'}     // 완료된 칸도 활성화된 스타일
+                     `}
             >
               <div className="font-medium">{c.name}</div>
               <div className="mt-1">
