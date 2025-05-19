@@ -1,4 +1,3 @@
-// src/components/PhoneFrame.jsx
 import React, { useState } from 'react'
 import DispatchHome        from './DispatchHome.jsx'
 import DispatchListView    from './DispatchListView.jsx'
@@ -6,8 +5,8 @@ import TrainingView        from './TrainingView.jsx'
 import RechargeView        from './RechargeView.jsx'
 import DispatchMissionView from './DispatchMissionView.jsx'
 
-// stars → 초 단위 소요 시간 매핑
-const DURATION_SEC = { 1: 10, 2: 30, 3: 60 }
+// 난이도별 소요시간(초)
+const DURATION_SECONDS = { 1: 10, 2: 30, 3: 60 }
 
 export default function PhoneFrame() {
   // 전체 앱 상태
@@ -17,10 +16,11 @@ export default function PhoneFrame() {
   const [stamina, setStamina] = useState(10)
   const [gems, setGems]       = useState(100)
 
-  // 훈련해서 획득한 일꾼 누적
+  // 훈련한 일꾼
   const [trainedWorkers, setTrainedWorkers] = useState([])
 
-  // 파견 중인 회사 목록: { key: number, remaining: number }[]
+  // 파견 중인 회사 목록
+  // { key, remaining, stone, piece }
   const [dispatchedCompanies, setDispatchedCompanies] = useState([])
 
   // 홈 → train / list
@@ -32,48 +32,49 @@ export default function PhoneFrame() {
     }
   }
 
-  // 리스트 → 선택된 기업
+  // 리스트 → 미션 화면
   function handleListSelect(company) {
     setView({ type: 'mission', building: null, company })
   }
 
-  // mission 완료 → 스태미너 차감·파견등록·리스트 복귀
-  function handleMissionComplete(companyKey, costStamina, ceoKeys, stars) {
-    // 스태미너 차감
-    setStamina(s => Math.max(0, s - costStamina))
-    // 파견중 리스트에 추가 (초 단위 남은 시간)
-    const duration = DURATION_SEC[stars] || 0
+  // 미션 시작: 스태미너 차감하고 dispatchedCompanies 에 추가
+  function handleDispatchStart(m) {
+    const sec = DURATION_SECONDS[m.stars] || 0
+    setStamina(s => Math.max(0, s - m.staminaNeed))
     setDispatchedCompanies(arr => [
       ...arr,
-      { key: companyKey, remaining: duration }
+      { key: m.key, remaining: sec, stone: m.stone, piece: m.piece }
     ])
-    // 리스트 화면으로 돌아가기
     setView({ type: 'list', building: null, company: null })
+  }
+
+  // 보상 수령: 해당 항목 제거
+  function handleCollectReward(companyKey) {
+    setDispatchedCompanies(arr =>
+      arr.filter(x => x.key !== companyKey)
+    )
   }
 
   // 훈련 완료
   function handleTrain(level, count) {
-    setStamina(s => Math.max(0, s - 10))
+    setStamina(s => s - 10)
     setTrainedWorkers(ws => {
       const idx = ws.findIndex(w => w.key === view.building.key)
       if (idx >= 0) {
         const updated = { ...ws[idx], count: ws[idx].count + count }
         return [...ws.slice(0, idx), updated, ...ws.slice(idx + 1)]
       } else {
-        return [
-          ...ws,
-          { key: view.building.key, label: view.building.label, count }
-        ]
+        return [...ws, { key: view.building.key, label: view.building.label, count }]
       }
     })
   }
 
-  // 뒤로가기
+  // 뒤로가기 홈
   function goHome() {
     setView({ type: 'home', building: null, company: null })
   }
 
-  // 리스트 새로고침
+  // 새로고침
   function handleRefresh() {
     if (gems < 10) {
       alert('젬이 부족합니다.')
@@ -88,7 +89,7 @@ export default function PhoneFrame() {
         {/* 노치 */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-3 bg-gray-900 rounded-b-xl" />
 
-        {/* 내부 화면 교체 */}
+        {/* 내부 */}
         <div className="absolute inset-3 bg-yellow-50 rounded-2xl overflow-hidden">
           {view.type === 'home' ? (
             <DispatchHome
@@ -104,6 +105,7 @@ export default function PhoneFrame() {
               onRefresh={handleRefresh}
               onDispatchStart={handleListSelect}
               dispatchedCompanies={dispatchedCompanies}
+              onCollectReward={handleCollectReward}
             />
           ) : view.type === 'train' ? (
             <TrainingView
@@ -128,10 +130,7 @@ export default function PhoneFrame() {
               availableStamina={stamina}
               trainedWorkers={trainedWorkers}
               onBack={() => setView({ type: 'list', building: null, company: null })}
-              // stars 정보를 함께 전달하기 위해 래핑
-              onDispatchConfirm={(companyKey, costStamina, ceoKeys) =>
-                handleMissionComplete(companyKey, costStamina, ceoKeys, view.company.stars)
-              }
+              onDispatchConfirm={handleDispatchStart}
             />
           ) : null}
         </div>
