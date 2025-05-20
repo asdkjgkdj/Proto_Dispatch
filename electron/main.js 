@@ -1,24 +1,27 @@
 // electron/main.js
-const path = require('path')
 const { app, BrowserWindow } = require('electron')
+const path = require('path')
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 360,
-    height: 640,
+    height: 720,
+    autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      // preload가 필요하면 주석 해제
-      // preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
     }
   })
 
-  // 프로덕션 모드: dist/index.html
-  win.loadFile(path.join(__dirname, '../dist/index.html'))
-  
-  // 개발 모드(vite dev)용으로는 아래를 사용
-  // win.loadURL('http://localhost:3000')
+  if (process.env.NODE_ENV === 'production') {
+    // production: 빌드된 정적 파일 로드
+    win.loadFile(path.join(__dirname, '../dist/index.html'))
+  } else {
+    // dev: Vite 개발 서버 열기
+    win.loadURL('http://localhost:3000')
+    win.webContents.openDevTools({ mode: 'detach' })
+  }
 }
 
 app.whenReady().then(createWindow)
