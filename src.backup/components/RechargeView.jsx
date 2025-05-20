@@ -1,6 +1,5 @@
 import React from 'react'
 import { Button } from './ui/button'
-import { asset } from '../utils/asset'
 
 export default function RechargeView({ onBack, onRecharge }) {
   return (

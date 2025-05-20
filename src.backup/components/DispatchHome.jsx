@@ -1,8 +1,13 @@
+// src/utils/asset.js
+export function asset(path) {
+  return import.meta.env.BASE_URL + path
+}
+import { asset } from '../utils/asset'
 
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 // src/components/DispatchHome.jsx
 import React, { useState } from 'react'
 import { Button } from './ui/button'
-import { asset } from '../utils/asset'
 
 const BUILDINGS = [
   { key: 'tech',  img: '/images/tech_support.png',    label: '기술지원',  stamina: 1, col: 1, row: 2 },

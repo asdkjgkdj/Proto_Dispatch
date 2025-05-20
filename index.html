@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <!-- ① 이 라인을 추가 -->
-    <script src="https://cdn.tailwindcss.com"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proto Dispatch</title>
+
++ <!-- 배포 시 Vite 의 base 옵션(/Proto_Dispatch/) 으로 치환됩니다 -->
+  <base href="%BASE_URL%" />
+
+  <!-- tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
   <div id="root"></div>

@@ -1,9 +1,10 @@
 
+import { asset } from '../utils/asset'
 
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 // src/components/TrainingModal.jsx
 import React from 'react'
 import { Button } from './ui/button'
-import { asset } from '../utils/asset'
 
 // training 관련 상수
 const TRAIN_TIME = 30  // 기본 30분
@@ -25,11 +26,11 @@ export default function TrainingModal({ building, onClose }) {
         </button>
         <div className="flex space-x-4">
           <div className="flex items-center bg-white/25 px-2 py-1 rounded-full">
-            <img src={asset('images/gem_icon.png')} alt="gem" className="w-5 h-5 mr-1" />
+            <img src="/images/gem_icon.png" alt="gem" className="w-5 h-5 mr-1" />
             <span>100</span>
           </div>
           <div className="flex items-center bg-white/25 px-2 py-1 rounded-full">
-            <img src={asset('images/stamina_icon.png')} alt="stamina" className="w-5 h-5 mr-1" />
+            <img src="/images/stamina_icon.png" alt="stamina" className="w-5 h-5 mr-1" />
             <span>10</span>
           </div>
         </div>

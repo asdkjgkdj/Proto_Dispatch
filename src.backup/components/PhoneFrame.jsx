@@ -1,13 +1,13 @@
 
+import { asset } from '../utils/asset'
 
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 import React, { useState, useEffect } from 'react'
 import DispatchHome        from './DispatchHome.jsx'
 import DispatchListView    from './DispatchListView.jsx'
 import TrainingView        from './TrainingView.jsx'
 import RechargeView        from './RechargeView.jsx'
 import DispatchMissionView from './DispatchMissionView.jsx'
-import { asset } from '../utils/asset'
-
 
 // 난이도별 소요시간(초)
 const DURATION_SECONDS = { 1: 10, 2: 30, 3: 60 }

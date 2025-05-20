@@ -1,8 +1,11 @@
+
+import { asset } from '../utils/asset'
+
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 // src/components/DispatchMissionView.jsx
 import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import Toast from './ui/Toast'
-import { asset } from '../utils/asset'
 
 // 난이도★별 소요 시간 텍스트 매핑
 const DURATION_TEXT = {
@@ -163,7 +166,7 @@ export default function DispatchMissionView({
       <header className="flex items-center justify-between mb-4">
         <Button onClick={onBack} className="px-3 py-1">← 뒤로</Button>
         <div className="flex items-center bg-white px-2 py-1 rounded-full">
-          <img src={asset('images/stamina_icon.png')} className="w-4 h-4 mr-1" alt="stamina"/>
+          <img src="/images/stamina_icon.png" className="w-4 h-4 mr-1" alt="stamina"/>
           <span>{availableStamina}</span>
         </div>
       </header>
@@ -222,7 +225,7 @@ export default function DispatchMissionView({
                     />
                     <div className="flex items-center text-xs">
                       <img
-                        src={asset('images/dispatch_ability.png')}
+                        src="/images/dispatch_ability.png"
                         className="w-4 h-4 mr-1"
                         alt="power"
                       />
@@ -270,7 +273,7 @@ export default function DispatchMissionView({
 
       {/* 소요 시간 */}
       <div className="flex items-center justify-center mb-2 text-sm text-gray-700">
-        <img src={asset('images/Time_Icon.png')} alt="time" className="w-4 h-4 mr-1" />
+        <img src="/images/Time_Icon.png" alt="time" className="w-4 h-4 mr-1" />
         <span>소요 시간: {durationText}</span>
       </div>
 
@@ -281,7 +284,7 @@ export default function DispatchMissionView({
         onClick={doDispatch}
       >
         <img
-          src={asset('images/stamina_icon.png')}
+          src="/images/stamina_icon.png"
           className="w-4 h-4 mr-1"
           alt="stamina"
         />
@@ -345,7 +348,7 @@ export default function DispatchMissionView({
                     />
                     <div className="flex items-center text-xs">
                       <img
-                        src={asset('images/dispatch_ability.png')}
+                        src="/images/dispatch_ability.png"
                         className="w-4 h-4 mr-1"
                         alt="power"
                       />

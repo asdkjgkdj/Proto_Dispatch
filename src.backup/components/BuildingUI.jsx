@@ -1,7 +1,11 @@
-
-
-import React, { useState } from 'react';
+// src/utils/asset.js
+export function asset(path) {
+  return import.meta.env.BASE_URL + path
+}
 import { asset } from '../utils/asset'
+
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
+import React, { useState } from 'react';
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 

@@ -1,10 +1,11 @@
 
+import { asset } from '../utils/asset'
 
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 // src/components/TrainingView.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from './ui/button'
 import Toast from './ui/Toast.jsx'
-import { asset } from '../utils/asset'
 
 export default function TrainingView({
   building,
@@ -70,14 +71,14 @@ export default function TrainingView({
         </button>
         <div className="flex space-x-2">
           <div className="flex items-center bg-white/25 px-2 py-1 rounded-full">
-            <img src={asset('images/gem_icon.png')} alt="gem" className="w-4 h-4 mr-1" />
+            <img src="/images/gem_icon.png" alt="gem" className="w-4 h-4 mr-1" />
             <span>100</span>
           </div>
           <button
             onClick={onRechargeOpen}
             className="flex items-center bg-white/25 px-2 py-1 rounded-full"
           >
-            <img src={asset('images/stamina_icon.png')} alt="stamina" className="w-4 h-4 mr-1" />
+            <img src="/images/stamina_icon.png" alt="stamina" className="w-4 h-4 mr-1" />
             <span>{availableStamina}</span>
           </button>
         </div>
@@ -130,7 +131,7 @@ export default function TrainingView({
             <Button className="flex-1 bg-yellow-400 text-black text-xs">
               즉시 완료{' '}
               <img
-                src={asset('images/gem_icon.png')}
+                src="/images/gem_icon.png"
                 alt="gem"
                 className="inline w-3 h-3 ml-1"
               />{' '}
@@ -139,7 +140,7 @@ export default function TrainingView({
             <Button className="flex-1 bg-blue-600 text-white text-xs">
               가속{' '}
               <img
-                src={asset('images/gem_icon.png')}
+                src="/images/gem_icon.png"
                 alt="gem"
                 className="inline w-3 h-3 ml-1"
               />{' '}
@@ -207,7 +208,7 @@ export default function TrainingView({
 
           {/* 총 시간 */}
           <div className="flex items-center justify-end mb-2 text-sm text-gray-700">
-            <img src={asset('images/Time_Icon.png')} alt="time" className="w-4 h-4 mr-1" />
+            <img src="/images/Time_Icon.png" alt="time" className="w-4 h-4 mr-1" />
             <span>{totalSeconds}초</span>
           </div>
 
@@ -216,7 +217,7 @@ export default function TrainingView({
             <Button className="flex-1 bg-yellow-400 text-black text-xs">
               즉시 완료{' '}
               <img
-                src={asset('images/gem_icon.png')}
+                src="/images/gem_icon.png"
                 alt="gem"
                 className="inline w-3 h-3 ml-1"
               />{' '}
@@ -228,7 +229,7 @@ export default function TrainingView({
             >
               훈련{' '}
               <img
-                src={asset('images/stamina_icon.png')}
+                src="/images/stamina_icon.png"
                 alt="stamina"
                 className="inline w-3 h-3 ml-1"
               />{' '}

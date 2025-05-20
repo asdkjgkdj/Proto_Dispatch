@@ -1,9 +1,10 @@
 
+import { asset } from '../utils/asset'
 
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 import React, { useState } from 'react';
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { asset } from '../utils/asset'
 
 export default function DispatchMission({ units, onComplete }) {
   const [selected, setSelected] = useState([]);

@@ -1,7 +1,6 @@
 // src/components/DispatchCenter.jsx
 
 import React, { useState } from 'react'
-import { asset } from '../utils/asset'
 import TabNav         from './ui/TabNav'
 import CompanyGrid    from './Dispatch/CompanyGrid'
 import DispatchDetail from './Dispatch/DispatchDetail'

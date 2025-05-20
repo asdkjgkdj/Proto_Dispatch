@@ -1,10 +1,11 @@
 
+import { asset } from '../utils/asset'
 
+<img src={asset('images/dispatch_center.png')} alt="dispatch" />
 // src/components/DispatchListView.jsx
 import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import Toast from './ui/Toast'
-import { asset } from '../utils/asset'
 
 // 초기 9개 회사 + ★난이도
 const INITIAL_COMPANIES = [
@@ -113,11 +114,11 @@ export default function DispatchListView({
         <Button onClick={onBack} className="px-3 py-1">← 뒤로</Button>
         <div className="flex space-x-2">
           <div className="flex items-center bg-white px-2 py-1 rounded-full">
-            <img src={asset('images/gem_icon.png')} alt="gem" className="w-4 h-4 mr-1"/>
+            <img src="/images/gem_icon.png" alt="gem" className="w-4 h-4 mr-1"/>
             <span>{gems}</span>
           </div>
           <div className="flex items-center bg-white px-2 py-1 rounded-full">
-            <img src={asset('images/stamina_icon.png')} alt="stamina" className="w-4 h-4 mr-1"/>
+            <img src="/images/stamina_icon.png" alt="stamina" className="w-4 h-4 mr-1"/>
             <span>{availableStamina}</span>
           </div>
         </div>
@@ -195,26 +196,26 @@ export default function DispatchListView({
             <div className="font-medium mb-1">보상</div>
             <div className="flex justify-around mb-3">
               <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
-                <img src={asset('images/reward/stone.png')} alt="stone" className="w-8 h-8 mb-1"/>
+                <img src="/images/reward/stone.png" alt="stone" className="w-8 h-8 mb-1"/>
                 <span className="text-sm">강화석</span>
                 <span className="font-semibold">{detail.stone}</span>
               </div>
               <div className="flex flex-col items-center bg-gray-100 p-2 rounded">
-                <img src={asset('images/reward/piece.png')} alt="piece" className="w-8 h-8 mb-1"/>
+                <img src="/images/reward/piece.png" alt="piece" className="w-8 h-8 mb-1"/>
                 <span className="text-sm">조각</span>
                 <span className="font-semibold">{detail.piece}</span>
               </div>
             </div>
             <p className="text-sm mb-4">
               필요 스태미너:{' '}
-              <img src={asset('images/stamina_icon.png')} alt="stamina" className="inline w-4 h-4 align-text-bottom"/>
+              <img src="/images/stamina_icon.png" alt="stamina" className="inline w-4 h-4 align-text-bottom"/>
               <span className="ml-1 font-semibold">{detail.staminaNeed}</span>
             </p>
             <Button
               className="w-full bg-green-400 text-white font-bold py-2 flex items-center justify-center"
               onClick={doDispatch}
             >
-              <img src={asset('images/stamina_icon.png')} alt="stamina" className="w-4 h-4 mr-1"/>
+              <img src="/images/stamina_icon.png" alt="stamina" className="w-4 h-4 mr-1"/>
               파견 ({detail.staminaNeed})
             </Button>
           </div>
@@ -231,12 +232,12 @@ export default function DispatchListView({
             <p className="mb-4">보상을 획득하세요!</p>
             <div className="flex justify-around mb-6">
               <div className="flex flex-col items-center">
-                <img src={asset('images/reward/stone.png')} alt="stone" className="w-10 h-10 mb-1"/>
+                <img src="/images/reward/stone.png" alt="stone" className="w-10 h-10 mb-1"/>
                 <span className="font-semibold">{rewardModal.stone}</span>
                 <span className="text-sm">강화석</span>
               </div>
               <div className="flex flex-col items-center">
-                <img src={asset('images/reward/piece.png')} alt="piece" className="w-10 h-10 mb-1"/>
+                <img src="/images/reward/piece.png" alt="piece" className="w-10 h-10 mb-1"/>
                 <span className="font-semibold">{rewardModal.piece}</span>
                 <span className="text-sm">조각</span>
               </div>
