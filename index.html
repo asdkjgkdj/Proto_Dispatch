@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <!-- ① viewport 전에 추가 -->
-    <base href="/Proto_Dispatch/" />
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Proto Dispatch</title>
+
+    <!-- ✨ 이 줄이 중요합니다. Vite가 빌드 시 base 옵션에 맞게 /Proto_Dispatch/을 치환 -->
+    <base href="/Proto_Dispatch/" />
+
+    <!-- 개발 편의를 위해 CDN 삽입; 프로덕션에선 빌드된 CSS로 대체하세요 -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" crossorigin src="/Proto_Dispatch/assets/index-C_V68QWj.js"></script>
     <link rel="stylesheet" crossorigin href="/Proto_Dispatch/assets/index-B1OCwjZX.css">
   </head>
   <body>
     <div id="root"></div>
-    <!-- 빌드 시 자동으로 올바른 경로로 바뀝니다 -->
+    <!-- Vite entry point: 이 태그를 Vite가 감지해서 빌드된 JS로 바꿔줍니다 -->
   </body>
 </html>
