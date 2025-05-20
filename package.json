@@ -1,31 +1,30 @@
 {
   "name": "proto-dispatch",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.1.0",
+ "main": "electron/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+   "dev": "vite",
+   "electron:dev": "concurrently \"npm:dev\" \"wait-on http://localhost:3000 && electron .\"",
+   "build": "vite build",
+   "dist": "npm run build && electron-builder"
   },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
+ "build": {
+   "appId": "com.yourcompany.proto-dispatch",
+   "files": [
+     "dist/**/*",
+     "electron/**/*"
+   ],
+   "directories": {
+     "buildResources": "public"
+   },
+   "mac": { "target": "dmg" },
+   "win": { "target": "nsis" },
+   "linux": { "target": "AppImage" }
+ },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@tailwindcss/postcss": "^4.1.6",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.4.1",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9.25.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.6",
-    "vite": "^6.3.5"
+    "electron": "^26.0.0",
+    "electron-builder": "^24.0.0",
+    "concurrently": "^7.0.0",
+    "wait-on": "^7.0.0"
   }
 }
